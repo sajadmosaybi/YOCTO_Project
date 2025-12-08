@@ -1,65 +1,80 @@
-# Yocto Project Tutorial
+## Step 2: Build Linux for STM32MP1
 
-Welcome to this step-by-step tutorial on the **Yocto Project**. This repository is designed to guide you through understanding, building, and customizing embedded Linux systems using Yocto.
-
----
-
-## Introduction
-
-The **Yocto Project** is an open-source collaboration project that helps developers create custom Linux-based systems for embedded devices. Unlike traditional Linux distributions, Yocto allows you to generate a fully customized Linux image, tailored specifically for your hardware and application needs.
-
-Key features of Yocto Project include:
-
-- Flexible and scalable build system.
-- Ability to create minimal or full-featured Linux images.
-- Extensive support for cross-compilation.
-- Reproducible builds for consistent software delivery.
-- Integration with various package managers (RPM, DEB, IPK).
+In this section, we will build a custom Linux image for the **STM32MP1** series using the Yocto Project.
 
 ---
 
-## Yocto Project Structure
+### 2.1 Prerequisites
 
-A typical Yocto Project setup consists of the following components:
+Make sure your development machine has the following installed:
 
-1. **Poky**  
-   The reference distribution of Yocto, which includes BitBake (build engine) and meta layers.
+- Linux OS (Ubuntu 22.04 recommended)
+- Git
+- Required packages:
+```
+sudo apt-get update
+sudo apt-get install -y gawk wget git-core diffstat unzip texinfo gcc-multilib \
+     build-essential chrpath socat cpio python3 python3-pip python3-pexpect \
+     xz-utils debianutils iputils-ping
+```
 
-2. **BitBake**  
-   The build tool used to parse metadata and recipes to build images and packages.
+# Create a directory for Yocto
+```
+mkdir ~/yocto-stm32mp1
+mkdir -p ~/yocto-stm32mp1/build
+cd ~/yocto-stm32mp1
+```
+# Clone Poky (Yocto reference)
+```
+git clone -b mickledore git://git.yoctoproject.org/poky.git
+cd poky
+```
+# Clone meta-openembedded for additional recipes
+```
+git clone -b mickledore git://git.openembedded.org/meta-openembedded
+```
+# Clone STM32 BSP layer
+```
+git clone -b mickledore https://github.com/STMicroelectronics/meta-st-stm32mp.git
+```
+# Setup the Build Environment
+```
+source oe-init-build-env ../build/STM32MP1
+```
+# Configure the Build for STM32MP1
+```
+MACHINE ?= "stm32mp1"
+```
+You can also customize other settings such as number of parallel builds:
+```
+BB_NUMBER_THREADS = "8"
+PARALLEL_MAKE = "-j 8"
+RM_OLD_IMAGE = "1"
+INHERIT += "rm_work"
+```
+# Add BSP Layers
+Edit build/conf/bblayers.conf and add the paths to the layers
+```
+BBLAYERS ?= " \
+  ${TOPDIR}/../poky/meta \
+  ${TOPDIR}/../poky/meta-poky \
+  ${TOPDIR}/../poky/meta-yocto-bsp \
+  ${TOPDIR}/../meta-openembedded/meta-oe \
+  ${TOPDIR}/../meta-openembedded/meta-networking \
+  ${TOPDIR}/../meta-openembedded/meta-python \
+  ${TOPDIR}/../meta-st-stm32mp \
+"
+```
+# Show BSP Layers
+```
+bitbake-layers show-layers
+```
+# Build the Linux Image
+Now, you can build the Linux image:
+```
+bitbake core-image-minimal
+```
+```core-image-minimal``` is a small Linux image. You can replace it with core-image-full-cmdline or create a custom image.
 
-3. **Metadata**  
-   - **Recipes (`.bb` files)**: Instructions for building packages or images.  
-   - **Classes (`.bbclass` files)**: Reusable sets of instructions for multiple recipes.  
-   - **Configuration (`.conf` files)**: Define build settings, machine types, and more.
-
-4. **Layers**  
-   Layers organize metadata and recipes for easier management:
-   - **Core Layer**: Base system recipes provided by Poky.  
-   - **Board Support Package (BSP) Layer**: Hardware-specific recipes for boards.  
-   - **Custom Layers**: Your own recipes, configurations, or additional software.
-
-5. **Build Directory**  
-   The directory where the build output is generated, including images, packages, and temporary build files.
-
----
-
-## What You Will Learn
-
-By following this tutorial, you will learn how to:
-
-- Set up a Yocto Project environment.
-- Create and customize images for your target hardware.
-- Add and modify recipes.
-- Build reproducible Linux images.
-
----
-
-## Next Steps
-
-The next section of this tutorial will cover **setting up your Yocto Project environment** on your development machine, including all necessary tools and dependencies.
-
----
-
-> Note: This tutorial assumes basic familiarity with Linux command line and embedded Linux concepts.
+The build may take a few hours depending on your machine.
 
