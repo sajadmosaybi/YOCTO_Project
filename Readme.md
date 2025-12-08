@@ -10,6 +10,7 @@ Make sure your development machine has the following installed:
 
 - Linux OS (Ubuntu 22.04 recommended)
 - Git
+- vscode
 - Required packages:
 ```
 sudo apt-get update
