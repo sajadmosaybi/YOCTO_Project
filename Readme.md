@@ -1,10 +1,10 @@
-## Step 2: Build Linux for STM32MP1
+## Build Linux for STM32MP1
 
 In this section, we will build a custom Linux image for the **STM32MP1** series using the Yocto Project.
 
 ---
 
-### 2.1 Prerequisites
+### Prerequisites
 
 Make sure your development machine has the following installed:
 
