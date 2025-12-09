@@ -78,4 +78,17 @@ bitbake core-image-minimal
 ```core-image-minimal``` is a small Linux image. You can replace it with core-image-full-cmdline or create a custom image.
 
 The build may take a few hours depending on your machine.
+# Set up the SD card
+In this first lab we will use an SD card to store the bootloader, kernel and root filesystem files. To generate
+the final image, you will find a script in $BUILDDIR/tmp/deploy/images/stm32mp1/scripts.
 
+```
+./create_sdcard_from_flashlayout.sh \
+../flashlayout_core-image-minimal/extensible/FlashLayout_sdcard_\
+stm32mp157d-dk1-extensible.tsv
+```
+Flash the SD card with that image:
+```
+sudo dd if=../FlashLayout_sdcard_stm32mp157d-dk1-extensible.raw of=/dev/Name_of_sdcard bs=8M \
+conv=fdatasync status=progress
+```
