@@ -1,65 +1,72 @@
-# Yocto Project Tutorial
+# Adding a Package to Yocto Project Image (Method 1)
 
-Welcome to this step-by-step tutorial on the **Yocto Project**. This repository is designed to guide you through understanding, building, and customizing embedded Linux systems using Yocto.
+This guide explains how to include a package directly in your Yocto Project image using the `IMAGE_INSTALL` variable.
 
----
+## Prerequisites
 
-## Introduction
+- Yocto Project environment set up
+- Build environment sourced:
 
-The **Yocto Project** is an open-source collaboration project that helps developers create custom Linux-based systems for embedded devices. Unlike traditional Linux distributions, Yocto allows you to generate a fully customized Linux image, tailored specifically for your hardware and application needs.
+```bash
+source oe-init-build-env
+```
 
-Key features of Yocto Project include:
+## Steps to Add a Package
 
-- Flexible and scalable build system.
-- Ability to create minimal or full-featured Linux images.
-- Extensive support for cross-compilation.
-- Reproducible builds for consistent software delivery.
-- Integration with various package managers (RPM, DEB, IPK).
+1. Check available recipes and their layers:
 
----
+```bash
+bitbake-layers show-recipes <package-name>
+```
+**Example:**
+```
+embedded@embedded:~/Documents/STM32MP157/yocto/poky/Linux_Build$ bitbake-layers show-recipes ethtool
+NOTE: Starting bitbake server...
+Loading cache: 100% |###################################################################################################################################################################| Time: 0:00:00
+Loaded 3876 entries from dependency cache.
+=== Matching recipes: ===
+ethtool:
+  meta                 5.16
+```
+If the layer containing the package recipe is not added to your Yocto build, you need to add the layer before you can build the package. Here’s what you should do step by step:
+```
+bitbake-layers add-layer Name_of_layer
+```
+This will display the layer each recipe comes from, helping you ensure the package is available.
 
-## Yocto Project Structure
+2. Open the Yocto configuration file:
 
-A typical Yocto Project setup consists of the following components:
+```bash
+nano conf/local.conf
+```
 
-1. **Poky**  
-   The reference distribution of Yocto, which includes BitBake (build engine) and meta layers.
+3. Append the package to `IMAGE_INSTALL`:
 
-2. **BitBake**  
-   The build tool used to parse metadata and recipes to build images and packages.
+```bash
+IMAGE_INSTALL:append = " <package-name>"
+```
 
-3. **Metadata**  
-   - **Recipes (`.bb` files)**: Instructions for building packages or images.  
-   - **Classes (`.bbclass` files)**: Reusable sets of instructions for multiple recipes.  
-   - **Configuration (`.conf` files)**: Define build settings, machine types, and more.
+**Example:**
 
-4. **Layers**  
-   Layers organize metadata and recipes for easier management:
-   - **Core Layer**: Base system recipes provided by Poky.  
-   - **Board Support Package (BSP) Layer**: Hardware-specific recipes for boards.  
-   - **Custom Layers**: Your own recipes, configurations, or additional software.
+```bash
+IMAGE_INSTALL:append = " nano"
+```
 
-5. **Build Directory**  
-   The directory where the build output is generated, including images, packages, and temporary build files.
+4. Rebuild the image:
 
----
+```bash
+bitbake core-image-minimal
+```
 
-## What You Will Learn
+## Verify Package Installation
 
-By following this tutorial, you will learn how to:
+After flashing and booting the image on your target device:
 
-- Set up a Yocto Project environment.
-- Create and customize images for your target hardware.
-- Add and modify recipes.
-- Build reproducible Linux images.
+```bash
+which <package-name>
+<package-name> --version
+```
 
----
+## References
 
-## Next Steps
-
-The next section of this tutorial will cover **setting up your Yocto Project environment** on your development machine, including all necessary tools and dependencies.
-
----
-
-> Note: This tutorial assumes basic familiarity with Linux command line and embedded Linux concepts.
-
+- [Yocto Project Documentation](https://www.yoctoproject.org/docs/)
