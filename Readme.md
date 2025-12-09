@@ -50,6 +50,14 @@ IMAGE_INSTALL:append = " <package-name>"
 
 ```bash
 IMAGE_INSTALL:append = " nano"
+IMAGE_INSTALL:append = " python3"
+IMAGE_INSTALL:append = " git"
+IMAGE_INSTALL:append = " htop"
+IMAGE_INSTALL:append = " nano"
+IMAGE_INSTALL:append = " ethtool"
+IMAGE_INSTALL:append = " net-snmp"
+IMAGE_INSTALL:append = " openssh"
+IMAGE_INSTALL:append = " lftp"
 ```
 
 4. Rebuild the image:
