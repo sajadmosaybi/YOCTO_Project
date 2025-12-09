@@ -1,4 +1,4 @@
-# Adding a Package to Yocto Project Image (Method 1)
+# Adding a Package to Yocto Project Image
 
 This guide explains how to include a package directly in your Yocto Project image using the `IMAGE_INSTALL` variable.
 
