@@ -1,65 +1,67 @@
-# Yocto Project Tutorial
+# Yocto Project – Configure Root Password Using Hashed Password (Step‑By‑Step)
 
-Welcome to this step-by-step tutorial on the **Yocto Project**. This repository is designed to guide you through understanding, building, and customizing embedded Linux systems using Yocto.
-
----
-
-## Introduction
-
-The **Yocto Project** is an open-source collaboration project that helps developers create custom Linux-based systems for embedded devices. Unlike traditional Linux distributions, Yocto allows you to generate a fully customized Linux image, tailored specifically for your hardware and application needs.
-
-Key features of Yocto Project include:
-
-- Flexible and scalable build system.
-- Ability to create minimal or full-featured Linux images.
-- Extensive support for cross-compilation.
-- Reproducible builds for consistent software delivery.
-- Integration with various package managers (RPM, DEB, IPK).
+This guide explains how to securely set the **root password** in a Yocto image using a **SHA‑512 hashed password** via `local.conf`.
 
 ---
 
-## Yocto Project Structure
+## ✅ Requirements
 
-A typical Yocto Project setup consists of the following components:
-
-1. **Poky**  
-   The reference distribution of Yocto, which includes BitBake (build engine) and meta layers.
-
-2. **BitBake**  
-   The build tool used to parse metadata and recipes to build images and packages.
-
-3. **Metadata**  
-   - **Recipes (`.bb` files)**: Instructions for building packages or images.  
-   - **Classes (`.bbclass` files)**: Reusable sets of instructions for multiple recipes.  
-   - **Configuration (`.conf` files)**: Define build settings, machine types, and more.
-
-4. **Layers**  
-   Layers organize metadata and recipes for easier management:
-   - **Core Layer**: Base system recipes provided by Poky.  
-   - **Board Support Package (BSP) Layer**: Hardware-specific recipes for boards.  
-   - **Custom Layers**: Your own recipes, configurations, or additional software.
-
-5. **Build Directory**  
-   The directory where the build output is generated, including images, packages, and temporary build files.
+- Host PC with Linux
+- Working Yocto Project build environment
+- A build directory (example: `~/yocto/build`)
 
 ---
 
-## What You Will Learn
+## Step 1 – Go to Your Yocto Build Directory
 
-By following this tutorial, you will learn how to:
+Open a terminal and run:
 
-- Set up a Yocto Project environment.
-- Create and customize images for your target hardware.
-- Add and modify recipes.
-- Build reproducible Linux images.
+```bash
+cd ~/yocto/build
+```
+## Step 2 – Generate a Secure Hashed Password
+Create a SHA‑512 password hash:
+```bash
+openssl passwd -6
+```
+When prompted:
+```bash
+Password: mypassword
+Verifying - Password: mypassword
+```
+Example output (this will be different for you):
+```bash
+$6$abc123$xyz456EncryptedHashValueHere
+```
+✅ Copy this entire hash.
+## Step 3 – Edit Yocto Configuration File
+Open local.conf:
+```bash
+nano conf/local.conf
+```
+Add the following at the end of the file:
+```bash
+INHERIT += "extrausers"
+EXTRA_USERS_PARAMS = "usermod -p '$6$abc123$xyz456EncryptedHashValueHere' root;"
+```
+⚠️ Replace the hash above with your real hash.
+## Step 4 – Build the Yocto Image
+```bash
+bitbake core-image-minimal
+```
+## Step 5 – Flash and Boot Your Target Board
+Flash the generated image to your SD card or device following your board’s instructions.
+Boot your embedded Linux system.
+## Step 6 – Login Using the New Root Password
+```bash
+login: root
+password: <your_password>
+```
+## Optional – Verify Password Change
+After login, run:
+```bash
+cat /etc/shadow | grep root
+```
+You should see the hashed password stored.
 
----
-
-## Next Steps
-
-The next section of this tutorial will cover **setting up your Yocto Project environment** on your development machine, including all necessary tools and dependencies.
-
----
-
-> Note: This tutorial assumes basic familiarity with Linux command line and embedded Linux concepts.
 
