@@ -41,8 +41,11 @@ nano conf/local.conf
 ```
 Add the following at the end of the file:
 ```bash
+EXTRA_IMAGE_FEATURES:remove = " debug-tweaks"
+EXTRA_IMAGE_FEATURES:remove = " allow-root-login"
+ROOTPASSWD = "$6$abc123$xyz456EncryptedHashValueHere"
 INHERIT += "extrausers"
-EXTRA_USERS_PARAMS = "usermod -p '$6$abc123$xyz456EncryptedHashValueHere' root;"
+EXTRA_USERS_PARAMS = "usermod -p '${ROOTPASSWD}' root;"
 ```
 ⚠️ Replace the hash above with your real hash.
 ## Step 4 – Build the Yocto Image
