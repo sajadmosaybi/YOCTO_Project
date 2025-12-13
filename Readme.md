@@ -65,7 +65,17 @@ A = "bar"
 - **Immediate variable expansion**.
 - The value is expanded **immediately** at the point of assignment.
 ```bitbake
-MY_VAR := "ImmediateValue"
+# Override
+A ?= "foo"
+A := "bar"
+
+# The final value is A="bar" 
+
+# Variable Expansion
+A = "foo"
+B := "${A}"
+A = "bar"
+# The final value is B="foo" 
 ```
 
 ## 5. `+=`
@@ -81,7 +91,31 @@ MY_VAR += " Appended"
 - Inserts a **space** between the prepended value and the existing value.
 - Takes effect immediately.
 ```bitbake
-MY_VAR =+ "Prepended "
+# Spaces are added here
+
+# Append
+A = "foo"
+A += "bar"
+
+# The final value is A="foo bar" 
+
+# Prepend
+B = "foo"
+B =+ "bar"
+
+# The final value is B="bar foo"
+
+# Append
+A ?= "val"
+A += "var"
+
+# The final value is A="var"
+
+# Prepend
+B ??= "val"
+B =+ "var"
+
+# The final value is B="var"
 ```
 
 ## 7. `.= `
@@ -97,7 +131,17 @@ MY_VAR .= "AppendedNoSpace"
 - **No space** is inserted.
 - Takes effect immediately.
 ```bitbake
-MY_VAR =. "PrependedNoSpace"
+# Append
+A = "foo"
+A .= "bar"
+
+# The final value is A="foobar" 
+
+# Prepend
+B = "foo"
+B =. "bar"
+
+# The final value is B="barfoo"
 ```
 
 ## 9. `:append`
@@ -105,7 +149,21 @@ MY_VAR =. "PrependedNoSpace"
 - **No space** is inserted.
 - Effects are applied **at variable expansion time**, not immediately.
 ```bitbake
-MY_VAR:append = "AppendedLater"
+# Append
+A = "foo"
+A:append = "bar"
+# The final value is A="foobar" 
+
+# Append
+A = "foo"
+A:append = "bar"
+A += "val"
+# The final value is A="foo valbar" 
+
+# Append
+A = "foo"
+A:append = " bar"
+# The final value is A="foo bar" 
 ```
 
 ## 10. `:prepend`
@@ -113,14 +171,37 @@ MY_VAR:append = "AppendedLater"
 - **No space** is inserted.
 - Effects are applied **at variable expansion time**.
 ```bitbake
-MY_VAR:prepend = "PrependedLater"
+# Prepend
+A = "foo"
+A:prepend = "bar"
+# The final value is A="barfoo" 
+
+# Prepend
+A = "foo"
+A:prepend = "bar"
+A =+ "val"
+# The final value is A="barval foo" 
+
+# Prepend
+A = "foo"
+A:prepend = "bar "
+# The final value is A="bar foo" 
 ```
 
 ## 11. `:remove`
 - Removes values from a list variable.
 - All occurrences of the specified value are removed.
 ```bitbake
-MY_VAR:remove = "ValueToRemove"
+#remove
+
+A = "foo bar"
+A:remove = "foo"
+# The final value is A=" bar" 
+
+A = "foo bar"
+A:remove = "var"
+A += "var"
+# The final value is A=" foo bar val" 
 ```
 
 ---
