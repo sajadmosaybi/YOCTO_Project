@@ -203,17 +203,6 @@ A:remove = "var"
 A += "var"
 # The final value is A=" foo bar val" 
 ```
-
----
-
-## Examples
-
-### Modifying `IMAGE_INSTALL`
-```bitbake
-IMAGE_INSTALL += "vim git"
-IMAGE_INSTALL_append = " htop"
-IMAGE_INSTALL_prepend = "nano "
-```
 ---
 
 ## References
