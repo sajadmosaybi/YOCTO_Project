@@ -1,65 +1,79 @@
-# Yocto Project Tutorial
 
-Welcome to this step-by-step tutorial on the **Yocto Project**. This repository is designed to guide you through understanding, building, and customizing embedded Linux systems using Yocto.
+# meta-mylayer
+This is a custom Yocto layer that contains example recipes and configurations.
 
----
+## How to Create the Layer
+From your Yocto build directory:
+```sh
+source oe-init-build-env
+bitbake-layers create-layer ../sources/meta-mylayer
+```
 
-## Introduction
+This creates the standard layout:
+```
+meta-mylayer/
+├── conf/
+│   └── layer.conf
+├── COPYING.MIT
+├── README.md
+└── recipes-example/
+    └── example/
+        └── example_0.1.bb
+```
 
-The **Yocto Project** is an open-source collaboration project that helps developers create custom Linux-based systems for embedded devices. Unlike traditional Linux distributions, Yocto allows you to generate a fully customized Linux image, tailored specifically for your hardware and application needs.
+## How to Add the Layer
+Enable it in your build:
+```sh
+bitbake-layers add-layer ../sources/meta-mylayer
+```
+Or manually add it to `conf/bblayers.conf`.
 
-Key features of Yocto Project include:
+## Layer Configuration (layer.conf)
+**Location:** `meta-mylayer/conf/layer.conf`
+```
+# We have a conf and classes directory, add to BBPATH
+BBPATH .= ":${LAYERDIR}"
 
-- Flexible and scalable build system.
-- Ability to create minimal or full-featured Linux images.
-- Extensive support for cross-compilation.
-- Reproducible builds for consistent software delivery.
-- Integration with various package managers (RPM, DEB, IPK).
+# We have recipes-* directories, add to BBFILES
+BBFILES += "${LAYERDIR}/recipes-*/*/*.bb \
+            ${LAYERDIR}/recipes-*/*/*.bbappend"
 
----
+BBFILE_COLLECTIONS += "meta-mylayer"
+BBFILE_PATTERN_meta-mylayer = "^${LAYERDIR}/"
+BBFILE_PRIORITY_meta-mylayer = "6"
 
-## Yocto Project Structure
+LAYERDEPENDS_meta-mylayer = "core"
+LAYERSERIES_COMPAT_meta-mylayer = "kirkstone"
+```
+- `BBFILE_PRIORITY`: Layer priority for conflicting recipes.
+- `BBFILES`: Path for BitBake to find recipes.
+- `LAYERDEPENDS`: Layers this layer depends on.
+- `LAYERSERIES_COMPAT`: Compatible Yocto releases.
 
-A typical Yocto Project setup consists of the following components:
+## Example Recipe (example_0.1.bb)
 
-1. **Poky**  
-   The reference distribution of Yocto, which includes BitBake (build engine) and meta layers.
+**Location:** `meta-mycustomlayer/recipes-example/example/example_0.1.bb`
+```
+SUMMARY = "bitbake-layers recipe"
+DESCRIPTION = "Recipe created by bitbake-layers"
+LICENSE = "MIT"
 
-2. **BitBake**  
-   The build tool used to parse metadata and recipes to build images and packages.
+python do_display_banner() {
+    bb.plain("***********************************************");
+    bb.plain("*                                             *");
+    bb.plain("*  Example recipe created by bitbake-layers   *");
+    bb.plain("*                                             *");
+    bb.plain("***********************************************");
+}
+addtask display_banner before do_build
+```
+## How to Compile Example Recipe
+```
+bitbake example
+```
+## How to Add Content
+Put recipes under `recipes-*/*/*.bb` and edit `layer.conf` as needed.
 
-3. **Metadata**  
-   - **Recipes (`.bb` files)**: Instructions for building packages or images.  
-   - **Classes (`.bbclass` files)**: Reusable sets of instructions for multiple recipes.  
-   - **Configuration (`.conf` files)**: Define build settings, machine types, and more.
-
-4. **Layers**  
-   Layers organize metadata and recipes for easier management:
-   - **Core Layer**: Base system recipes provided by Poky.  
-   - **Board Support Package (BSP) Layer**: Hardware-specific recipes for boards.  
-   - **Custom Layers**: Your own recipes, configurations, or additional software.
-
-5. **Build Directory**  
-   The directory where the build output is generated, including images, packages, and temporary build files.
-
----
-
-## What You Will Learn
-
-By following this tutorial, you will learn how to:
-
-- Set up a Yocto Project environment.
-- Create and customize images for your target hardware.
-- Add and modify recipes.
-- Build reproducible Linux images.
-
----
-
-## Next Steps
-
-The next section of this tutorial will cover **setting up your Yocto Project environment** on your development machine, including all necessary tools and dependencies.
-
----
-
-> Note: This tutorial assumes basic familiarity with Linux command line and embedded Linux concepts.
-
+## Notes
+* Layers should start with `meta-` by convention.
+* For detailed documentation, visit [Yocto Project Layers](https://docs.yoctoproject.org/dev-manual/layers.html).
