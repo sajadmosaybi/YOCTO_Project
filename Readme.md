@@ -1,65 +1,117 @@
-# Yocto Project Tutorial
+# Compiling C Code in the Yocto Project
 
-Welcome to this step-by-step tutorial on the **Yocto Project**. This repository is designed to guide you through understanding, building, and customizing embedded Linux systems using Yocto.
+This guide explains how to compile a simple C application using the
+Yocto Project. Unlike traditional Linux systems, Yocto uses **BitBake
+recipes** to cross-compile applications for embedded targets.
 
----
+------------------------------------------------------------------------
 
-## Introduction
+## 1. Key Concept
 
-The **Yocto Project** is an open-source collaboration project that helps developers create custom Linux-based systems for embedded devices. Unlike traditional Linux distributions, Yocto allows you to generate a fully customized Linux image, tailored specifically for your hardware and application needs.
+You **do not compile C code manually** in Yocto using `gcc`.
 
-Key features of Yocto Project include:
+Instead, you: - Write a BitBake recipe (`.bb`) - Let Yocto use its
+cross-compiler - Install the binary into the root filesystem
+automatically
 
-- Flexible and scalable build system.
-- Ability to create minimal or full-featured Linux images.
-- Extensive support for cross-compilation.
-- Reproducible builds for consistent software delivery.
-- Integration with various package managers (RPM, DEB, IPK).
+------------------------------------------------------------------------
 
----
+## 2. Example C Application
 
-## Yocto Project Structure
+### `counter.c`
 
-A typical Yocto Project setup consists of the following components:
+``` c
+#include <stdio.h>
+#include <unistd.h>  // for sleep()
 
-1. **Poky**  
-   The reference distribution of Yocto, which includes BitBake (build engine) and meta layers.
+int main(void)
+{
+    int counter = 0;
 
-2. **BitBake**  
-   The build tool used to parse metadata and recipes to build images and packages.
+    while (1)  // infinite loop
+    {
+        printf("Counter: %d\n", counter);
+        counter++;          // increment counter
+        sleep(1);           // wait 1 second
+    }
 
-3. **Metadata**  
-   - **Recipes (`.bb` files)**: Instructions for building packages or images.  
-   - **Classes (`.bbclass` files)**: Reusable sets of instructions for multiple recipes.  
-   - **Configuration (`.conf` files)**: Define build settings, machine types, and more.
+    return 0;
+}
 
-4. **Layers**  
-   Layers organize metadata and recipes for easier management:
-   - **Core Layer**: Base system recipes provided by Poky.  
-   - **Board Support Package (BSP) Layer**: Hardware-specific recipes for boards.  
-   - **Custom Layers**: Your own recipes, configurations, or additional software.
+```
+------------------------------------------------------------------------
 
-5. **Build Directory**  
-   The directory where the build output is generated, including images, packages, and temporary build files.
+## 3. Directory Structure
 
----
+    meta-mylayer/
+    └── recipes-example/
+        └── counter/
+            ├── counter_0.1.bb
+            └── files
+                 └── counter.c
+------------------------------------------------------------------------
 
-## What You Will Learn
+## 4. BitBake Recipe
 
-By following this tutorial, you will learn how to:
+### `counter_0.1.bb`
 
-- Set up a Yocto Project environment.
-- Create and customize images for your target hardware.
-- Add and modify recipes.
-- Build reproducible Linux images.
+``` bitbake
+SUMMARY = "Counter Code Program"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
----
+SRC_URI = "file://counter.c"
+S = "${WORKDIR}/build"
 
-## Next Steps
+python do_display_banner() {
+    bb.plain("***********************************************");
+    bb.plain("*                                             *");
+    bb.plain("*  Counter Code Build Running...              *");
+    bb.plain("*                                             *");
+    bb.plain("***********************************************");
+}
+addtask display_banner before do_build
 
-The next section of this tutorial will cover **setting up your Yocto Project environment** on your development machine, including all necessary tools and dependencies.
+do_compile(){
+    ${CC} ${CFLAGS} ${LDFLAGS} ${WORKDIR}/counter.c -o ${S}/counter
+}
+do_install(){
+    install -d ${D}${bindir}
+    install -m 0755 ${S}/counter ${D}${bindir}/
+}
+```
 
----
+------------------------------------------------------------------------
 
-> Note: This tutorial assumes basic familiarity with Linux command line and embedded Linux concepts.
+## 5. Add Application to Image
 
+In `local.conf` or your image recipe:
+
+``` bitbake
+IMAGE_INSTALL:append = " counter"
+```
+
+------------------------------------------------------------------------
+
+## 6. Build the Image
+
+``` bash
+bitbake core-image-minimal
+```
+
+------------------------------------------------------------------------
+
+## 7. Run on Target
+
+``` bash
+counter
+```
+
+Output:
+
+    Counter: 1
+    Counter: 2
+    .
+    .
+
+-----------------------------------------------------------------------
