@@ -96,7 +96,6 @@ If you see:
 The package is included in the root filesystem.
 
 2. After flashing and booting the image on your target device:
-
 ```bash
 which <package-name>
 <package-name> --version
