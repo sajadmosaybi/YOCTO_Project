@@ -76,8 +76,26 @@ bitbake core-image-minimal
 ```
 
 ## Verify Package Installation
+In Yocto, you can verify that a package is installed in your image before booting the embedded board using several reliable methods.
+1. Check if Package Is Included in Image (Build-Time Check):
+Go to:
+```bash
+tmp/deploy/images/stm32mp1/
+```
+Find the .manifest file:
+```bash
+core-image-minimal-stm32mp1.manifest
+```
+```bash
+cat core-image-minimal-stm32mp1.manifest | grep <Package Name>
+```
+If you see:
+```bash
+<Package Name> <version>
+```
+The package is included in the root filesystem.
 
-After flashing and booting the image on your target device:
+2. After flashing and booting the image on your target device:
 
 ```bash
 which <package-name>
