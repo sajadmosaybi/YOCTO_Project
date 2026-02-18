@@ -18,6 +18,11 @@ source oe-init-build-env
 ```bash
 bitbake-layers show-recipes <package-name>
 ```
+2. This shows the exact path of the .bb file:
+
+```bash
+bitbake -e <package-name> | grep ^FILE=
+```
 **Example:**
 ```
 embedded@embedded:~/Documents/STM32MP157/yocto/poky/Linux_Build$ bitbake-layers show-recipes ethtool
@@ -27,6 +32,10 @@ Loaded 3876 entries from dependency cache.
 === Matching recipes: ===
 ethtool:
   meta                 5.16
+```
+```
+embedded@embedded-HP-EliteDesk-800-G1-SFF:~/Documents/Yocto/STM32MP157_build$ bitbake -e ethtool | grep ^FILE=
+FILE="/home/embedded/Documents/Yocto/poky-kirkstone-4.0.32/meta/recipes-extended/ethtool/ethtool_5.16.bb"
 ```
 If the layer containing the package recipe is not added to your Yocto build, you need to add the layer before you can build the package. Here’s what you should do step by step:
 ```
