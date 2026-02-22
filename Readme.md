@@ -11,7 +11,7 @@ bitbake-layers create-layer ../sources/meta-mylayer
 
 This creates the standard layout:
 ```
-meta-mylayer/
+meta-mycustom-layer/
 ├── conf/
 │   └── layer.conf
 ├── COPYING.MIT
@@ -24,7 +24,7 @@ meta-mylayer/
 ## How to Add the Layer
 Enable it in your build:
 ```sh
-bitbake-layers add-layer ../sources/meta-mylayer
+bitbake-layers add-layer ../poky/meta-mycustom-layer
 ```
 Or manually add it to `conf/bblayers.conf`.
 
