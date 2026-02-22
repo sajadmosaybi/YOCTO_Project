@@ -43,7 +43,7 @@ int main(void)
 
 ## 3. Directory Structure
 
-    meta-mylayer/
+    meta-mycustom-layer/
     └── recipes-example/
         └── counter/
             ├── counter_0.1.bb
