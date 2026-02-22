@@ -39,18 +39,17 @@ bitbake -c listtasks core-image-minimal
 
 ## Commonly Used Tasks
 
-  Task           Description
-  -------------- ---------------------------
-  do_fetch       Downloads source code
-  do_unpack      Extracts source archive
-  do_patch       Applies patches
-  do_configure   Runs configure step
-  do_compile     Compiles source
-  do_install     Installs to staging
-  do_package     Creates packages
-  do_rootfs      Generates root filesystem
-  do_image       Creates final image
-
+| Task         | Description                    |
+|--------------|--------------------------------|
+| `do_fetch`   | Downloads source code          |
+| `do_unpack`  | Extracts source archive        |
+| `do_patch`   | Applies patches                |
+| `do_configure` | Runs configure step         |
+| `do_compile` | Compiles source                |
+| `do_install` | Installs to staging area       |
+| `do_package` | Creates binary packages        |
+| `do_rootfs`  | Generates root filesystem      |
+| `do_image`   | Creates final image            |
 ------------------------------------------------------------------------
 
 ## Visualizing Task Dependencies
