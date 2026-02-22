@@ -33,12 +33,13 @@ Example output (this will be different for you):
 ```bash
 $6$abc123$xyz456EncryptedHashValueHere
 ```
-## Notice:
+### Notice
 you can generate your own password string with ```openssl passwd -1 mysecretpassword``` but note that ```$``` needs to be escaped with ```\```as shown in the example.
 ```bash
 ROOTPASSWD = "\$6\$abc123\$xyz456EncryptedHashValueHere"
-## Step 3 – Edit Yocto Configuration File
 ```
+## Step 3 – Edit Yocto Configuration File
+
 Open local.conf:
 ```bash
 nano conf/local.conf
