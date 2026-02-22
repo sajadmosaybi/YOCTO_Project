@@ -33,6 +33,8 @@ Example output (this will be different for you):
 ```bash
 $6$abc123$xyz456EncryptedHashValueHere
 ```
+# Notice
+you can generate your own password string with openssl passwd -1 mysecretpassword but note that $ needs to be escaped with \ as shown in the example.
 ✅ Copy this entire hash.
 ## Step 3 – Edit Yocto Configuration File
 Open local.conf:
@@ -42,8 +44,8 @@ nano conf/local.conf
 Add the following at the end of the file:
 ```bash
 EXTRA_IMAGE_FEATURES:remove = " debug-tweaks"
-EXTRA_IMAGE_FEATURES:remove = " allow-root-login"
-ROOTPASSWD = "$6$abc123$xyz456EncryptedHashValueHere"
+EXTRA_IMAGE_FEATURES:append = " allow-root-login"
+ROOTPASSWD = "\$6\$abc123\$xyz456EncryptedHashValueHere"
 INHERIT += "extrausers"
 EXTRA_USERS_PARAMS = "usermod -p '${ROOTPASSWD}' root;"
 ```
