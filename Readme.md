@@ -19,7 +19,7 @@ VAR ?= "foo"
 VAR ?= "bar"
 VAR ?= "val"
 VAR ?= "var"
-# The final value is TEST="foo" 
+# The final value is VAR="foo" 
 ```
 
 ## 2. `??=`
@@ -32,14 +32,14 @@ VAR ??= "bar"
 VAR ??= "val"
 VAR ??= "var"
 
-# The final value is TEST="var"
+# The final value is VAR="var"
 
 VAR ??= "foo"
 VAR ?= "bar"
 VAR ?= "val"
 VAR ??= "var"
 
-# The final value is TEST="bar" 
+# The final value is VAR="bar" 
 ```
 
 ## 3. `=`
