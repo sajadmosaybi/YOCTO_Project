@@ -15,11 +15,11 @@ This document provides an overview of variable assignment operators in Yocto, th
 - Assigns a **default value** to a variable.
 - Can be **overridden** later.
 ```bitbake
-VAR ?= "foo"
-VAR ?= "bar"
-VAR ?= "val"
-VAR ?= "var"
-# The final value is VAR="foo" 
+VAR1 ?= "1"
+VAR1 ?= "2"
+VAR1 ?= "3"
+VAR1 ?= "4"
+# The final value is VAR1="1" 
 ```
 
 ## 2. `??=`
@@ -27,19 +27,19 @@ VAR ?= "var"
 - Can be overridden.
 - If multiple assignments occur, the **last one** is considered.
 ```bitbake
-VAR ??= "foo"
-VAR ??= "bar"
-VAR ??= "val"
-VAR ??= "var"
+VAR2 ??= "1"
+VAR2 ??= "2"
+VAR2 ??= "3"
+VAR2 ??= "4"
 
-# The final value is VAR="var"
+# The final value is VAR2="4"
 
-VAR ??= "foo"
-VAR ?= "bar"
-VAR ?= "val"
-VAR ??= "var"
+VAR3 ??= "1"
+VAR3 ?= "2"
+VAR3 ?= "3"
+VAR3 ??= "4"
 
-# The final value is VAR="bar" 
+# The final value is VAR3="2" 
 ```
 
 ## 3. `=`
@@ -48,17 +48,17 @@ VAR ??= "var"
 - Variables are **expanded at the end**.
 ```bitbake
 # Override
-A ?= "foo"
-A = "bar"
+A ?= "1"
+A = "2"
 
-# The final value is A="bar" 
+# The final value is A="2" 
 
 # Variable Expansion
-A = "foo"
+A = "1"
 B = "${A}"
-A = "bar"
+A = "2"
 
-# The final value is B="bar" 
+# The final value is B="2" 
 ```
 
 ## 4. `:=`
@@ -109,7 +109,7 @@ B =+ "bar"
 A ?= "val"
 A += "var"
 
-# The final value is A="var"
+# The final value is A="val var"
 
 # Prepend
 B ??= "val"
