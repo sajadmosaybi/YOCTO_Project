@@ -1,65 +1,107 @@
-# Yocto Project Tutorial
+# ListTasks -- Yocto Project Task Explorer
 
-Welcome to this step-by-step tutorial on the **Yocto Project**. This repository is designed to guide you through understanding, building, and customizing embedded Linux systems using Yocto.
+## Overview
 
----
+ListTasks is a simple utility project designed to explore and understand
+BitBake tasks inside the Yocto Project build system.
 
-## Introduction
+This project helps embedded Linux developers:
 
-The **Yocto Project** is an open-source collaboration project that helps developers create custom Linux-based systems for embedded devices. Unlike traditional Linux distributions, Yocto allows you to generate a fully customized Linux image, tailored specifically for your hardware and application needs.
+-   View available BitBake tasks
+-   Understand task execution flow
+-   Inspect dependencies between tasks
+-   Debug build problems
+-   Learn Yocto internal workflow
 
-Key features of Yocto Project include:
+------------------------------------------------------------------------
 
-- Flexible and scalable build system.
-- Ability to create minimal or full-featured Linux images.
-- Extensive support for cross-compilation.
-- Reproducible builds for consistent software delivery.
-- Integration with various package managers (RPM, DEB, IPK).
+## Initialize Yocto Environment
 
----
+``` bash
+source oe-init-build-env
+```
 
-## Yocto Project Structure
+------------------------------------------------------------------------
 
-A typical Yocto Project setup consists of the following components:
+## Listing All Available Tasks
 
-1. **Poky**  
-   The reference distribution of Yocto, which includes BitBake (build engine) and meta layers.
+``` bash
+bitbake -c listtasks <recipe-name>
+```
 
-2. **BitBake**  
-   The build tool used to parse metadata and recipes to build images and packages.
+Example:
 
-3. **Metadata**  
-   - **Recipes (`.bb` files)**: Instructions for building packages or images.  
-   - **Classes (`.bbclass` files)**: Reusable sets of instructions for multiple recipes.  
-   - **Configuration (`.conf` files)**: Define build settings, machine types, and more.
+``` bash
+bitbake -c listtasks core-image-minimal
+```
 
-4. **Layers**  
-   Layers organize metadata and recipes for easier management:
-   - **Core Layer**: Base system recipes provided by Poky.  
-   - **Board Support Package (BSP) Layer**: Hardware-specific recipes for boards.  
-   - **Custom Layers**: Your own recipes, configurations, or additional software.
+------------------------------------------------------------------------
 
-5. **Build Directory**  
-   The directory where the build output is generated, including images, packages, and temporary build files.
+## Commonly Used Tasks
 
----
+  Task           Description
+  -------------- ---------------------------
+  do_fetch       Downloads source code
+  do_unpack      Extracts source archive
+  do_patch       Applies patches
+  do_configure   Runs configure step
+  do_compile     Compiles source
+  do_install     Installs to staging
+  do_package     Creates packages
+  do_rootfs      Generates root filesystem
+  do_image       Creates final image
 
-## What You Will Learn
+------------------------------------------------------------------------
 
-By following this tutorial, you will learn how to:
+## Visualizing Task Dependencies
 
-- Set up a Yocto Project environment.
-- Create and customize images for your target hardware.
-- Add and modify recipes.
-- Build reproducible Linux images.
+``` bash
+bitbake -g <recipe-name>
+dot -Tpng task-depends.dot -o tasks.png
+```
 
----
+------------------------------------------------------------------------
 
-## Next Steps
+## Running a Specific Task
 
-The next section of this tutorial will cover **setting up your Yocto Project environment** on your development machine, including all necessary tools and dependencies.
+``` bash
+bitbake -c <task> <recipe-name>
+```
 
----
+------------------------------------------------------------------------
 
-> Note: This tutorial assumes basic familiarity with Linux command line and embedded Linux concepts.
+## Cleaning Tasks
 
+``` bash
+bitbake -c clean <recipe>
+bitbake -c cleanall <recipe>
+```
+
+------------------------------------------------------------------------
+
+## Debugging Task Execution
+
+``` bash
+bitbake -v <recipe>
+bitbake -f -c <task> <recipe>
+```
+
+------------------------------------------------------------------------
+
+## Example Workflow
+
+``` bash
+source oe-init-build-env
+bitbake -c listtasks busybox
+bitbake busybox
+bitbake core-image-minimal
+```
+
+
+------------------------------------------------------------------------
+
+## Author
+
+\[Sajad Mosaybi\]\
+Embedded Linux & RTOS Instructor\
+Specialist in Embedded Systems, Yocto, Buildroot, and STM32 Platforms
