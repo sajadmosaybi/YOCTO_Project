@@ -99,7 +99,7 @@ do_install() {
 ```bash
 bitbake myapp
 ```
-### build image
+### Build the image
 ```bash
 nano conf/local.conf
 ```
@@ -107,6 +107,7 @@ add:
 ```bash
 IMAGE_INSTALL:append = " myapp"
 ```
+### Flash the generated image to the target board
 ```bash
 bitbake core-image-minimal
 tmp/deploy/images/stm32mp1/scripts/create_sdcard_from_flashlayout.sh tmp/deploy/images/stm32mp1/flashlayout_core-image-minimal/extensible/FlashLayout_sdcard_stm32mp157a-dk1-extensible.tsv
