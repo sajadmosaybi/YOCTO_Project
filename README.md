@@ -56,6 +56,7 @@ Embedded_Linux_Info: ELF 32-bit LSB pie executable, ARM, EABI5 version 1 (SYSV),
 In simple terms:
 
 🔧 It copies compiled output into the final package structure before packaging.
+
 ```do_install``` is the task responsible for installing built files into the temporary staging directory (```${D}```).
 ``` bash
 bitbake -c do_install information
