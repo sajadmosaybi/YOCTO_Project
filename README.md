@@ -67,3 +67,8 @@ nano conf/local.conf
 IMAGE_INSTALL:append = " information"
 bitbake core-image-minimal
 ```
+Flash Image into sdcard
+``` bash
+tmp/deploy/images/stm32mp1/scripts/create_sdcard_from_flashlayout.sh tmp/deploy/images/stm32mp1/flashlayout_core-image-minimal/extensible/FlashLayout_sdcard_stm32mp157a-dk1-extensible.tsv
+sudo dd if=tmp/deploy/images/stm32mp1/FlashLayout_sdcard_stm32mp157a-dk1-extensible.raw of=/dev/sdx bs=4M oflag=direct status=progres
+```
