@@ -31,3 +31,26 @@ Here:
 - Compiles sources
 - Links them
 ## 2️⃣ How Yocto Uses Makefile
+In Yocto:
+
+BitBake executes tasks like:
+- do_fetch
+- do_configure
+- do_compile
+- do_install
+
+If your software project contains a Makefile, Yocto will automatically run:
+```bash
+make
+make install
+```
+## 3️⃣ Example: Using a Makefile Project in Yocto
+
+
+
+
+
+
+
+
+
