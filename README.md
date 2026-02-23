@@ -37,9 +37,20 @@ Fetch data from ```SRC_URI```
 bitbake -c do_fetch information
 ```
 If everything is correct, you can use the working directory (```tmp/work/cortexa7t2hf-neon-vfpv4-poky-linux-gnueabi/information/1.0-r0```) to fetch the recipe content.
-do_unpack is a standard task in BitBake recipes that is responsible for:
 
 Extracting (unpacking) the source code or files defined in the ```SRC_URI``` variable using ```do_unpack``` command.
 ``` bash
 bitbake -c do_unpack information
+```
+If everything is correct, you can check the content of ```SRC_URI```, which includes the source code.
+
+🔧 Building (compiling) the source code of a recipe.
+``` bash
+bitbake -c do_compile information
+```
+The ```Embedded_Linux_info``` program can be found inside the unpacked directory.
+``` bash
+file Embedded_Linux_Info
+Embedded_Linux_Info: ELF 32-bit LSB pie executable, ARM, EABI5 version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-armhf.so.3, BuildID[sha1]=9ca2c91440bf97582bd63a843f7b87bc2ab1242a, for GNU/Linux 3.2.0, with debug_info, not stripped
+
 ```
