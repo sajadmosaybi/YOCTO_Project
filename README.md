@@ -52,5 +52,17 @@ The ```Embedded_Linux_info``` program can be found inside the unpacked directory
 ``` bash
 file Embedded_Linux_Info
 Embedded_Linux_Info: ELF 32-bit LSB pie executable, ARM, EABI5 version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-armhf.so.3, BuildID[sha1]=9ca2c91440bf97582bd63a843f7b87bc2ab1242a, for GNU/Linux 3.2.0, with debug_info, not stripped
+```
+In simple terms:
 
+🔧 It copies compiled output into the final package structure before packaging.
+```do_install``` is the task responsible for installing built files into the temporary staging directory (```${D}```).
+``` bash
+bitbake -c do_install information
+```
+Finally, add the information package to image."
+``` bash
+nano conf/local.conf
+IMAGE_INSTALL:append = " information"
+bitbake core-image-minimal
 ```
