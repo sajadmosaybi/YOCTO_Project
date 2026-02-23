@@ -1,164 +1,45 @@
+## Development of a Reproducible Embedded Linux Build System Using Yocto and Git Source Integration
+The main objective of this project is to integrate a C-based application into a Yocto-based embedded Linux system. The workflow includes creating a custom Yocto layer and recipe, retrieving the source code from a remote Git repository, applying the appropriate cross-compilation toolchain, and packaging the compiled application into the target system image. This approach ensures reproducible builds, platform independence, and seamless deployment on embedded hardware.
 
-# 🛠️ Yocto Project for STM32MP157
-
-This repository documents how to build a custom embedded Linux image using the **Yocto Project** for the **STM32MP157-DK1** development board.
-
----
-
-## 📌 About the Project
-
-Yocto is a flexible, powerful build system for creating custom Linux distributions. This setup uses **STMicroelectronics' Yocto BSP layers** to target the STM32MP1 platform.
-
----
-
-## 📦 Features
-
-- Based on **Poky + OpenEmbedded**
-- Includes **ST BSP layers**
-- Custom machine for **STM32MP157-DK1**
-- Generates bootloader, kernel, and root filesystem
-- Suitable for headless or GUI systems
-
----
-
-## 🧰 Requirements
-
-Install dependencies (Ubuntu 20.04+):
-
-```bash
-sudo apt update
-sudo apt install gawk wget git diffstat unzip texinfo gcc-multilib   build-essential chrpath socat cpio python3 python3-pip python3-pexpect   xz-utils debianutils iputils-ping libssl-dev
+``` bash
+cd poky/meta-mycustom-layer/recipes-example
+mkdir information
+nano information.bb
 ```
+add the content below to the ```information.bb``` file.
+``` bash
+SUMMARY = "Embedded linux Information program from GitHub"
+DESCRIPTION = "Embedded linux Information c code"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
----
+SRC_URI = "git://github.com/sajadmosaybi/Source.git;branch=main;protocol=https"
 
-## 📥 Download Yocto + STM32 Layers
+SRCREV = "c287c152fc3b84d3b7600873b10c5f5f1e54d4b8"
 
-```bash
-# Create a working directory
-mkdir stm32mp1-yocto && cd stm32mp1-yocto
+S = "${WORKDIR}/git/src"
 
-# Clone ST's OpenEmbedded layers
-repo init -u https://github.com/STMicroelectronics/oe-manifest.git -b refs/tags/openstlinux-6.1-yocto-mickledore-mp1-v23.06.21
-repo sync
+do_compile() {
+    ${CC} ${CFLAGS} ${LDFLAGS} Embedded_Linux_Info.c -o Embedded_Linux_Info
+}
+
+do_install() {
+    install -d ${D}${bindir}
+    install -m 0755 Embedded_Linux_Info ${D}${bindir}
+}
 ```
-
----
-
-## 🔧 Initialize Environment
-
-```bash
-DISTRO=openstlinux-weston MACHINE=stm32mp1 source layers/meta-st/scripts/envsetup.sh
+To find SRCREV (the correct Git commit hash) for a Yocto recipe, follow these steps:
+``` bash
+git ls-remote <Source address>
 ```
-
-You should now be inside a build directory like: `build-openstlinuxweston-stm32mp1`.
-
----
-
-## ⚙️ Configure and Build
-
-### Minimal Console Image:
-```bash
-bitbake st-image-core
+Fetch data from ```SRC_URI```
+``` bash
+bitbake -c do_fetch information
 ```
+If everything is correct, you can use the working directory (```tmp/work/cortexa7t2hf-neon-vfpv4-poky-linux-gnueabi/information/1.0-r0```) to fetch the recipe content.
+do_unpack is a standard task in BitBake recipes that is responsible for:
 
-### Full Weston GUI Image:
-```bash
-bitbake st-image-weston
+Extracting (unpacking) the source code or files defined in the ```SRC_URI``` variable using ```do_unpack``` command.
+``` bash
+bitbake -c do_unpack information
 ```
-
-> First build may take several hours. Internet is required to download sources.
-
----
-
-## 📤 Output
-
-Images will be located in:
-
-```
-build-openstlinuxweston-stm32mp1/tmp-glibc/deploy/images/stm32mp1/
-├── FlashLayout_sdcard_stm32mp157c-dk1-trusted.tsv
-├── st-image-core-stm32mp1.ext4
-├── u-boot-stm32mp157c-dk1-trusted.stm32
-├── zImage / uImage
-├── stm32mp157c-dk1.dtb
-```
-
----
-
-## 💽 Flash to SD Card
-
-ST provides the `create_sdcard_from_flashlayout.sh` script, or flash manually:
-
-```bash
-sudo dd if=st-image-core-stm32mp1.ext4 of=/dev/sdX bs=1M status=progress
-```
-
-> Replace `/dev/sdX` with your SD card path.
-
----
-
-## 🚀 Boot the Board
-
-1. Insert the SD card into STM32MP157-DK1.
-2. Connect USB-UART or HDMI.
-3. Power the board.
-4. You should see U-Boot followed by Linux boot.
-
----
-
-## 🛠️ Customize with Yocto
-
-You can add packages in `local.conf`:
-
-```conf
-IMAGE_INSTALL:append = " nano openssh python3"
-```
-
-To modify kernel configuration:
-
-```bash
-bitbake -c menuconfig virtual/kernel
-```
-
-To add your own application layer:
-```bash
-yocto-layer create my-layer
-```
-
----
-
-## 🖼️ Screenshots (Optional)
-
-<details>
-<summary><strong>1. Serial Console Boot Log</strong></summary>
-
-```
-U-Boot 2024.01 (Apr 29 2025)
-
-CPU: STM32MP157C Rev.B
-MMC: STM32 SD/MMC: 0
-Hit any key to stop autoboot: 0
-Booting Linux...
-
-[    0.000000] Linux version 6.1.38 (oe-user@yocto) ...
-stm32mp1 login: root
-```
-
-</details>
-
----
-
-## 🙋 Author & Credits
-
-Based on:
-- [ST Yocto BSP](https://wiki.st.com/stm32mpu/wiki/STM32MP1_Distribution_Package)
-- [Yocto Project](https://www.yoctoproject.org/)
-- [OpenEmbedded](https://www.openembedded.org/)
-
----
-
-## 📄 License
-
-This guide is provided under the MIT License.  
-Feel free to fork, modify, and contribute!
