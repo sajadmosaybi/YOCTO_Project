@@ -45,10 +45,73 @@ make
 make install
 ```
 ## 3️⃣ Example: Using a Makefile Project in Yocto
+Let’s say you have this simple C project:
+```
+myapp/
+ ├── myapp.c
+ └── Makefile
+```
+### myapp.c
+```bash
+#include <stdio.h>
+
+int main() {
+    printf("Hello Yocto\n");
+    return 0;
+}
+```
+### Makefile
+```bash
+CC ?= gcc
+CFLAGS ?= -Wall
+
+all:
+	$(CC) $(CFLAGS) $(LDFLAGS) myapp.c -o myapp
+
+clean:
+	rm -f myapp
+```
+copy ```myapp.c``` and ```MakeFile``` into ```meta-mycustom-layer/recipes-example/myapp/files```.
+### Yocto Recipe for This Makefile Project
+```bash
+cd meta-mycustom-layer/recipes-example
+mkdir -p myapp/files
+nano myapp_1.0.bb
+SUMMARY = "Simple Makefile Application"
+LICENSE = "CLOSED"
+
+SRC_URI = "file://main.c \
+           file://Makefile"
+
+S = "${WORKDIR}"
 
 
+do_compile() {
+    oe_runmake
+}
 
-
+do_install() {
+    install -d ${D}${bindir}
+    install -m 0755 myapp ${D}${bindir}
+}
+```
+### build myapp
+```bash
+bitbake myapp
+```
+### build image
+```bash
+nano conf/local.conf
+```
+add:
+```bash
+IMAGE_INSTALL:append = " myapp"
+```
+```bash
+bitbake core-image-minimal
+tmp/deploy/images/stm32mp1/scripts/create_sdcard_from_flashlayout.sh tmp/deploy/images/stm32mp1/flashlayout_core-image-minimal/extensible/FlashLayout_sdcard_stm32mp157a-dk1-extensible.tsv
+sudo dd if=tmp/deploy/images/stm32mp1/FlashLayout_sdcard_stm32mp157a-dk1-extensible.raw of=/dev/sdx bs=4M oflag=direct status=progress
+```
 
 
 
