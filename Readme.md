@@ -101,7 +101,7 @@ do_install(){
 
 This means:
 
-👉 When installing hello-app into the image
+👉 When installing rdepends-example into the image
 
 👉 The package bash must also be installed automatically
 
