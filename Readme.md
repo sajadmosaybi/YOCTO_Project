@@ -1,65 +1,144 @@
-# Yocto Project Tutorial
+# Step-by-Step Tutorial: Using CMake in Yocto
 
-Welcome to this step-by-step tutorial on the **Yocto Project**. This repository is designed to guide you through understanding, building, and customizing embedded Linux systems using Yocto.
+##  Overview
+This guide explains how to integrate a CMake-based C application (example: UDP server) into the Yocto Project.
 
----
-
-## Introduction
-
-The **Yocto Project** is an open-source collaboration project that helps developers create custom Linux-based systems for embedded devices. Unlike traditional Linux distributions, Yocto allows you to generate a fully customized Linux image, tailored specifically for your hardware and application needs.
-
-Key features of Yocto Project include:
-
-- Flexible and scalable build system.
-- Ability to create minimal or full-featured Linux images.
-- Extensive support for cross-compilation.
-- Reproducible builds for consistent software delivery.
-- Integration with various package managers (RPM, DEB, IPK).
+It covers:
+- Creating a CMake project
+- Writing a Yocto recipe
+- Using the cmake class
+- Building with bitbake
+- Adding the application to an image
 
 ---
 
-## Yocto Project Structure
+##  Example Project Structure
 
-A typical Yocto Project setup consists of the following components:
+Your application should look like this:
+```bash
+udp-server/
+├── CMakeLists.txt
+├── src/
+│   └── main.c
+```
+When used in Yocto, it must be placed inside:
+```bash
+meta-yourlayer/
+└── recipes-example/
+    └── udp-server/
+        ├── udp-server_1.0.bb
+        └── files/
+            ├── CMakeLists.txt
+            └── src/
+                └── main.c
+```
+---
 
-1. **Poky**  
-   The reference distribution of Yocto, which includes BitBake (build engine) and meta layers.
+##  Example CMakeLists.txt
 
-2. **BitBake**  
-   The build tool used to parse metadata and recipes to build images and packages.
+```cmake
+cmake_minimum_required(VERSION 3.10)
+project(udp_server C)
 
-3. **Metadata**  
-   - **Recipes (`.bb` files)**: Instructions for building packages or images.  
-   - **Classes (`.bbclass` files)**: Reusable sets of instructions for multiple recipes.  
-   - **Configuration (`.conf` files)**: Define build settings, machine types, and more.
+set(CMAKE_C_STANDARD 11)
 
-4. **Layers**  
-   Layers organize metadata and recipes for easier management:
-   - **Core Layer**: Base system recipes provided by Poky.  
-   - **Board Support Package (BSP) Layer**: Hardware-specific recipes for boards.  
-   - **Custom Layers**: Your own recipes, configurations, or additional software.
+add_executable(udp_server src/main.c)
 
-5. **Build Directory**  
-   The directory where the build output is generated, including images, packages, and temporary build files.
+install(TARGETS udp_server
+        RUNTIME DESTINATION bin)
+```
+
+Important:
+- Always use install()
+- Do NOT hardcode compilers
+- Let Yocto provide toolchain
 
 ---
 
-## What You Will Learn
+##  Example Yocto Recipe (udp-server_1.0.bb)
 
-By following this tutorial, you will learn how to:
+```bitbake
+SUMMARY = "Advanced UDP Server using CMake"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
-- Set up a Yocto Project environment.
-- Create and customize images for your target hardware.
-- Add and modify recipes.
-- Build reproducible Linux images.
+SRC_URI = "file://CMakeLists.txt \
+           file://src/main.c"
+
+S = "${WORKDIR}"
+
+inherit cmake
+
+EXTRA_OECMAKE += "-DCMAKE_BUILD_TYPE=Release"
+```
+
+Key Points:
+- Use ```inherit cmake```
+- Source files must be inside ```files/```
+- ```S = "${WORKDIR}"``` is required
 
 ---
 
-## Next Steps
+##  Build the Application
+```bash
+   source oe-init-build-env
+   bitbake udp-server
+```
+---
 
-The next section of this tutorial will cover **setting up your Yocto Project environment** on your development machine, including all necessary tools and dependencies.
+##  Add to Image
+
+Add to your image recipe:
+
+```IMAGE_INSTALL:append = " udp-server"```
+
+Then rebuild image:
+
+```bitbake core-image-minimal```
 
 ---
 
-> Note: This tutorial assumes basic familiarity with Linux command line and embedded Linux concepts.
+##  Clean Build (If Needed)
 
+```bash
+bitbake -c clean udp-server
+bitbake udp-server
+```
+
+---
+
+##  Common Errors
+
+- File not found → ensure files are inside ```files/```
+- do_fetch error → check ```SRC_URI``` path
+- Toolchain errors → ensure ```inherit cmake``` is used
+
+---
+##  Author
+
+**Author:** Sajad Mosaybi
+
+**Date:** 2026  
+
+**Purpose:** Educational guide for integrating CMake-based C applications into the Yocto Project.
+
+---
+
+##  References
+
+1. Yocto Project Documentation  
+   https://docs.yoctoproject.org/
+
+2. Yocto Project Development Manual  
+   https://docs.yoctoproject.org/dev-manual/
+
+3. Yocto CMake Class Documentation (`cmake.bbclass`)  
+   https://docs.yoctoproject.org/ref-manual/classes.html
+
+4. CMake Official Documentation  
+   https://cmake.org/documentation/
+
+5. BitBake User Manual  
+   https://docs.yoctoproject.org/bitbake/
+
+---
