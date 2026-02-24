@@ -17,20 +17,16 @@ It covers:
 Your application should look like this:
 ```bash
 udp-server/
-├── CMakeLists.txt
-├── src/
-│   └── main.c
+    ├── CMakeLists.txt
+    ├── udp_server.c.C
 ```
 When used in Yocto, it must be placed inside:
 ```bash
-meta-yourlayer/
-└── recipes-example/
-    └── udp-server/
-        ├── udp-server_1.0.bb
-        └── files/
-            ├── CMakeLists.txt
-            └── src/
-                └── main.c
+    udp-server/
+        ├── files
+        │   ├── CMakeLists.txt
+        │   └── udp_server.c
+        └── udp-server_1.0.bb
 ```
 ---
 
