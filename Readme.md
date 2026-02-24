@@ -1,65 +1,159 @@
-# Yocto Project Tutorial
+# Runtime Dependencies in the Yocto Project
 
-Welcome to this step-by-step tutorial on the **Yocto Project**. This repository is designed to guide you through understanding, building, and customizing embedded Linux systems using Yocto.
+## 🔹What is a Runtime Dependency in Yocto?
+In the Yocto Project, a runtime dependency means:
 
----
+A package that must be installed on the target system for another package to work correctly at runtime.
 
-## Introduction
+It is different from:
+- Build dependency → needed only during compilation
+- Runtime dependency → needed on the final target device
 
-The **Yocto Project** is an open-source collaboration project that helps developers create custom Linux-based systems for embedded devices. Unlike traditional Linux distributions, Yocto allows you to generate a fully customized Linux image, tailored specifically for your hardware and application needs.
+In Yocto, runtime dependencies are defined using ```RDEPENDS:${PN}```
+## 🔹Practical Example
+We will create:
+- A simple program called logger
+- It depends on ```bash```
+- We will define it as a runtime dependency
+- Then build an image and test it
 
-Key features of Yocto Project include:
+## 🔹Step-by-Step Example
+### ✅ Step 1  — Create a Simple Recipe
+Inside your layer:
+```bash
+rdepends-example/
+├── files
+│   └── logger.sh
+└── rdepends-example.bb
+```
 
-- Flexible and scalable build system.
-- Ability to create minimal or full-featured Linux images.
-- Extensive support for cross-compilation.
-- Reproducible builds for consistent software delivery.
-- Integration with various package managers (RPM, DEB, IPK).
+Create the file:
+```bash
+mkdir -p meta-mycustom-layer/recipes-example/rdepends-example/files
+nano meta-mycustom-layer/recipes-example/rdepends-example/files/logger.sh
+nano meta-mycustom-layer/recipes-example/rdepends-example/rdepends-example.bb
+```
 
----
+### ✅ Step 2 — Write the script
+#### logger.sh
+```bash
+#!/bin/sh
 
-## Yocto Project Structure
+# ==============================
+# Real-Time System Monitor
+# ==============================
 
-A typical Yocto Project setup consists of the following components:
+while true
+do
+    clear
+    echo "======================================"
+    echo "        SYSTEM MONITOR (LIVE)"
+    echo "======================================"
+    echo "Date: $(date)"
+    echo
 
-1. **Poky**  
-   The reference distribution of Yocto, which includes BitBake (build engine) and meta layers.
+    echo "----- CPU LOAD -----"
+    uptime
+    echo
 
-2. **BitBake**  
-   The build tool used to parse metadata and recipes to build images and packages.
+    echo "----- MEMORY USAGE -----"
+    free -h
+    echo
 
-3. **Metadata**  
-   - **Recipes (`.bb` files)**: Instructions for building packages or images.  
-   - **Classes (`.bbclass` files)**: Reusable sets of instructions for multiple recipes.  
-   - **Configuration (`.conf` files)**: Define build settings, machine types, and more.
+    echo "----- DISK USAGE -----"
+    df -h /
+    echo
 
-4. **Layers**  
-   Layers organize metadata and recipes for easier management:
-   - **Core Layer**: Base system recipes provided by Poky.  
-   - **Board Support Package (BSP) Layer**: Hardware-specific recipes for boards.  
-   - **Custom Layers**: Your own recipes, configurations, or additional software.
+    echo "----- TOP PROCESSES -----"
+    ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -10
+    echo
 
-5. **Build Directory**  
-   The directory where the build output is generated, including images, packages, and temporary build files.
+    sleep 5
+done
+```
+### ✅ Step 3 — Write the Recipe
+#### rdepends-example.bb
+```bash
+SUMMARY = "Logger Code Program"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
----
+SRC_URI = "file://logger.sh"
+S = "${WORKDIR}"
 
-## What You Will Learn
+python do_display_banner() {
+    bb.plain("***********************************************");
+    bb.plain("*                                             *");
+    bb.plain("*  Logger Code Build Running...              *");
+    bb.plain("*                                             *");
+    bb.plain("***********************************************");
+}
+addtask display_banner before do_build 
 
-By following this tutorial, you will learn how to:
+RDEPENDS:${PN} = "bash"
+do_install(){
+    install -d ${D}${bindir}
+    install -m 0755 ${S}/logger.sh ${D}${bindir}/
+}
+```
+## 🔹 Explanation
+```RDEPENDS:${PN} += "bash"```
 
-- Set up a Yocto Project environment.
-- Create and customize images for your target hardware.
-- Add and modify recipes.
-- Build reproducible Linux images.
+This means:
 
----
+👉 When installing hello-app into the image
 
-## Next Steps
+👉 The package bash must also be installed automatically
 
-The next section of this tutorial will cover **setting up your Yocto Project environment** on your development machine, including all necessary tools and dependencies.
+So if someone installs this package, Yocto will include bash in the image.
 
----
+## 🔹 Build the Package
+```bash
+bitbake rdepends-example
+```
+## 🔹 Add Package to Image
+Edit your conf/local.conf:
+```bash
+IMAGE_INSTALL:append = " rdepends-example"
+```
+## 🔹 Verify Runtime Dependency 
+```bash
+bitbake -e rdepends-example | grep ^RDEPENDS
+```
+If everything is correct, you should see the expected output.
+```bash
+embedded@embedded-HP-EliteDesk-800-G1-SFF:~/Documents/yocto/STM32MP1$ bitbake -e rdepends-example | grep ^RDEPENDS
+RDEPENDS:${KERNEL_PACKAGE_NAME}-base=""
+RDEPENDS:rdepends-example="bash"
+RDEPENDS:rdepends-example-dev="rdepends-example (= 1.0-r0)"
+RDEPENDS:rdepends-example-staticdev="rdepends-example-dev (= 1.0-r0)"
+```
+## Author
 
-> Note: This tutorial assumes basic familiarity with Linux command line and embedded Linux concepts.
+**Sajad Mosaybi**  
+Embedded Linux Developer  
+Specialization: Embedded Systems, Yocto Project, Buildroot, STM32, Linux Kernel Development  
 
+Project: Yocto Project Runtime Dependency Example  
+Year: 2026
+
+## References
+
+1. Yocto Project Documentation  
+   https://docs.yoctoproject.org/
+
+2. Yocto Project Mega-Manual  
+   https://docs.yoctoproject.org/singleindex.html
+
+3. BitBake User Manual  
+   https://docs.yoctoproject.org/bitbake/
+
+4. OpenEmbedded Documentation  
+   https://www.openembedded.org/wiki/Main_Page
+
+5. Embedded Linux Development with the Yocto Project  
+   Authors: Rudolf J. Streif, et al.
+
+6. Mastering Embedded Linux Programming  
+   Author: Chris Simmonds  
+   Publisher: Packt Publishing
