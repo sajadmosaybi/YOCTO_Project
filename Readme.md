@@ -53,6 +53,16 @@ INHERIT += "extrausers"
 EXTRA_USERS_PARAMS = "usermod -p '${ROOTPASSWD}' root;"
 ```
 ⚠️ Replace the hash above with your real hash.
+Additionally, the ```EXTRA_USERS_PARAMS``` variable can be used to create an additional user alongside the root user. Replace the following section accordingly.
+```bash
+EXTRA_IMAGE_FEATURES:remove = " debug-tweaks"
+EXTRA_IMAGE_FEATURES:append = " allow-root-login"
+ROOTPASSWD = "\$1\$7pIJt42T\$YEDxhTC0sTgUBI1snkhRj."
+INHERIT += "extrausers"
+EXTRA_USERS_PARAMS = "usermod -p '${ROOTPASSWD}' root; \
+                      useradd -m -s /bin/sh user1; \
+                      usermod -p '' user1;"
+```
 ## Step 4 – Build the Yocto Image
 ```bash
 bitbake core-image-minimal
