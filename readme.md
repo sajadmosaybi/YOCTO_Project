@@ -1,65 +1,101 @@
-# Yocto Project Tutorial
+# RPROVIDES in Yocto Recipes
 
-Welcome to this step-by-step tutorial on the **Yocto Project**. This repository is designed to guide you through understanding, building, and customizing embedded Linux systems using Yocto.
+## Overview
 
----
+`RPROVIDES` is a variable used in Yocto Project recipes to declare
+virtual package names that a recipe provides in addition to its real
+package name.
 
-## Introduction
+It allows one recipe to act as a replacement or alternative provider for
+another package without changing dependency declarations in other
+recipes.
 
-The **Yocto Project** is an open-source collaboration project that helps developers create custom Linux-based systems for embedded devices. Unlike traditional Linux distributions, Yocto allows you to generate a fully customized Linux image, tailored specifically for your hardware and application needs.
+## Purpose
 
-Key features of Yocto Project include:
+-   Enables package substitution
+-   Supports virtual packages
+-   Allows multiple implementations of the same functionality
+-   Improves system flexibility and modularity
 
-- Flexible and scalable build system.
-- Ability to create minimal or full-featured Linux images.
-- Extensive support for cross-compilation.
-- Reproducible builds for consistent software delivery.
-- Integration with various package managers (RPM, DEB, IPK).
+## How It Works
 
----
+Example:
 
-## Yocto Project Structure
+``` bash
+RPROVIDES:${PN} = "virtual/example"
+```
 
-A typical Yocto Project setup consists of the following components:
+This means:
 
-1. **Poky**  
-   The reference distribution of Yocto, which includes BitBake (build engine) and meta layers.
+-   The recipe provides the virtual package `virtual/example`
+-   Any other recipe depending on `virtual/example` will be satisfied by
+    this recipe
 
-2. **BitBake**  
-   The build tool used to parse metadata and recipes to build images and packages.
+## Example
 
-3. **Metadata**  
-   - **Recipes (`.bb` files)**: Instructions for building packages or images.  
-   - **Classes (`.bbclass` files)**: Reusable sets of instructions for multiple recipes.  
-   - **Configuration (`.conf` files)**: Define build settings, machine types, and more.
+### Old Recipe: myapp.bb
 
-4. **Layers**  
-   Layers organize metadata and recipes for easier management:
-   - **Core Layer**: Base system recipes provided by Poky.  
-   - **Board Support Package (BSP) Layer**: Hardware-specific recipes for boards.  
-   - **Custom Layers**: Your own recipes, configurations, or additional software.
+``` bash
+SUMMARY = "Simple Makefile Application"
+LICENSE = "CLOSED"
 
-5. **Build Directory**  
-   The directory where the build output is generated, including images, packages, and temporary build files.
+SRC_URI = "file://main.c \
+           file://Makefile"
 
----
+S = "${WORKDIR}"
 
-## What You Will Learn
+do_compile() {
+    oe_runmake
+}
 
-By following this tutorial, you will learn how to:
+do_install() {
+    install -d ${D}${bindir}
+    install -m 0755 myapp ${D}${bindir}
+}
+```
+Normally, you can include the ```myapp``` package in the image using the following command:
+``` bash
+IMAGE_INSTALL:append = " myapp"
+```
 
-- Set up a Yocto Project environment.
-- Create and customize images for your target hardware.
-- Add and modify recipes.
-- Build reproducible Linux images.
+### New Recipe: myapp_1.bb
 
----
+``` bash
+SUMMARY = "Simple Makefile Application"
+LICENSE = "CLOSED"
 
-## Next Steps
+SRC_URI = "file://main.c \
+           file://Makefile"
 
-The next section of this tutorial will cover **setting up your Yocto Project environment** on your development machine, including all necessary tools and dependencies.
+S = "${WORKDIR}"
 
----
+do_compile() {
+    oe_runmake
+}
 
-> Note: This tutorial assumes basic familiarity with Linux command line and embedded Linux concepts.
+do_install() {
+    install -d ${D}${bindir}
+    install -m 0755 myapp ${D}${bindir}
+}
+```
+In this scenario, the myapp package is not available in the build environment and cannot be referenced in the local.conf file. Consequently, the configuration ```IMAGE_INSTALL:append = " myapp"``` is not applicable.
 
+For everything to work properly, you can add the following commands to the myapp_1.bb recipe.
+``` bash
+RPROVIDES:${PN} = "myapp"
+```
+At this stage, the myapp package is correctly built and integrated into the final image.
+## When to Use RPROVIDES
+
+-   Replacing default implementations
+-   Providing hardware-specific implementations
+-   Creating alternative libraries or drivers
+-   Supporting multiple backends
+
+## Difference Between PROVIDES and RPROVIDES
+
+-   `PROVIDES` → Used for build-time recipe name replacement
+-   `RPROVIDES` → Used for runtime virtual package replacement
+
+In most cases for virtual package substitution, `RPROVIDES` is
+preferred.
