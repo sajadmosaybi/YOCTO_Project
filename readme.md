@@ -58,7 +58,7 @@ Normally, you can include the ```myapp``` package in the image using the followi
 IMAGE_INSTALL:append = " myapp"
 ```
 
-### New Recipe: myapp_1.bb
+### New Recipe: myapp1.bb
 
 ``` bash
 SUMMARY = "Simple Makefile Application"
@@ -80,7 +80,7 @@ do_install() {
 ```
 In this scenario, the myapp package is not available in the build environment and cannot be referenced in the local.conf file. Consequently, the configuration ```IMAGE_INSTALL:append = " myapp"``` is not applicable.
 
-For everything to work properly, you can add the following commands to the myapp_1.bb recipe.
+For everything to work properly, you can add the following commands to the myapp1.bb recipe.
 ``` bash
 RPROVIDES:${PN} = "myapp"
 ```
